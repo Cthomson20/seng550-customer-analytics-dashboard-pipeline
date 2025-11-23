@@ -1,16 +1,16 @@
 # seng550-customer-analytics-dashboard-pipeline
-
+This is a repository that includes our dataset and our ETL pipeline used to manipulate and ingest data in PostgreSQL.
 Install the following Dependencies:
-pySpark
-pyArrow
-pandas
+- pySpark
+- pyArrow
+- pandas
 
 Create a ".env" file that includes the following fields (note to inquire creds from admin):
-DB_HOST=?
-DB_PORT=?
-DB_NAME=?
-DB_USER=?
-DB_PASSWORD=?
+- DB_HOST=?
+- DB_PORT=?
+- DB_NAME=?
+- DB_USER=?
+- DB_PASSWORD=?
 
 Attempt to run the file, if the ETL does not complete, follow the next steps:
 
