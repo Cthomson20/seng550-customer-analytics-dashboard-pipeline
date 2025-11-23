@@ -1,5 +1,6 @@
 # seng550-customer-analytics-dashboard-pipeline
 This is a repository that includes our dataset and our ETL pipeline used to manipulate and ingest data in PostgreSQL.
+
 Install the following Dependencies:
 - pySpark
 - pyArrow
