@@ -19,8 +19,8 @@ m = Prophet(
 )
 m.fit(df[['ds', 'y']])
 
-# Forecast (7 years)
-future = m.make_future_dataframe(periods=7, freq='Y')
+# Forecast (10 years)
+future = m.make_future_dataframe(periods=10, freq='Y')
 forecast = m.predict(future)
 
 forecast['sales']        = np.expm1(forecast['yhat'])
@@ -44,5 +44,5 @@ combined = pd.concat([
     forecast_rows[['release_year','sales','sales_lower','sales_upper','type']]
 ]).sort_values('release_year')
 
-combined.to_csv("sales_forecast_final.csv", index=False)
-print("Created file: sales_forecast_final.csv")
+combined.to_csv("sales_forecast.csv", index=False)
+print("Created file: sales_forecast.csv")
