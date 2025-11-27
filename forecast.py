@@ -1,42 +1,48 @@
 import pandas as pd
+import numpy as np
 from prophet import Prophet
 
 # discovery and how to use from: https://medium.com/data-science/getting-started-predicting-time-series-data-with-facebook-prophet-c74ad3040525
 
-
-# read
 df = pd.read_csv("dataset/sales_per_year.csv")
-
-# drop null
 df = df[['release_year', 'total_sales']].dropna()
-
-# build dataframe
 df['ds'] = pd.to_datetime(df['release_year'], format='%Y')
-df['y'] = df['total_sales']
+df['y'] = np.log1p(df['total_sales'])
 
-df_prophet = df[['ds', 'y']]
+# Fit model
+m = Prophet(
+    yearly_seasonality=False,
+    weekly_seasonality=False,
+    daily_seasonality=False,
+    changepoint_prior_scale=0.2,
+    n_changepoints=10
+)
+m.fit(df[['ds', 'y']])
 
-# call prophet
-m = Prophet()
-m.fit(df_prophet)
-
-# Create forecast (next 10 years)
-future = m.make_future_dataframe(periods=10, freq='Y')
-
-# forecast
+# Forecast (7 years)
+future = m.make_future_dataframe(periods=7, freq='Y')
 forecast = m.predict(future)
 
-out = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].copy()
-out['release_year'] = out['ds'].dt.year
+forecast['sales']        = np.expm1(forecast['yhat'])
+forecast['sales_lower']  = np.expm1(forecast['yhat_lower'])
+forecast['sales_upper']  = np.expm1(forecast['yhat_upper'])
+forecast['release_year'] = forecast['ds'].dt.year
 
-# Merge actual + forecast
-merged = pd.merge(
-    out,
-    df[['release_year', 'total_sales']],
-    on='release_year',
-    how='left'
-)
+# Build unified dataset with ACTUAL + FORECAST
+actuals = df.copy()
+actuals['sales']       = actuals['total_sales']
+actuals['sales_lower'] = None
+actuals['sales_upper'] = None
+actuals['type']        = 'actual'
 
-# save
-merged.to_csv("sales_by_year_forecast.csv", index=False)
-print("Saved forecast to sales_by_year_forecast.csv")
+forecast_rows = forecast[['release_year','sales','sales_lower','sales_upper']].copy()
+forecast_rows['type'] = 'forecast'
+
+# Combine
+combined = pd.concat([
+    actuals[['release_year','sales','sales_lower','sales_upper','type']],
+    forecast_rows[['release_year','sales','sales_lower','sales_upper','type']]
+]).sort_values('release_year')
+
+combined.to_csv("sales_forecast_final.csv", index=False)
+print("Created file: sales_forecast_final.csv")
