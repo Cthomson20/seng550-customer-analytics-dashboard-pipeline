@@ -99,7 +99,7 @@ creator_df = df[["creator_id", "developer", "publisher"]]
 # ============================================
 
 # Select games columns (games_id, sales_id, creator_id already exist in df)
-games_df = df[["games_id", "sales_id", "creator_id", "title", "genre", "console", "critic_score"]]
+games_df = df[["games_id", "sales_id", "creator_id", "title", "genre", "console", "critic_score", "release_date"]]
 
 # filling NaN with 0 for critic_score
 games_df["critic_score"] = games_df["critic_score"].fillna(0)
